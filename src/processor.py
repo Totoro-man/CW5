@@ -38,6 +38,6 @@ def make_request(params: list) -> (bool, list | str):
     pass
 
 
-def print_error(error: str):
+def error_handling(error: str):
     print(error)
     sys.exit()
