@@ -9,3 +9,6 @@
 - psycopg2
 
 # БД типа PostgreSQL
+
+Список компаний взят со страниы
+https://www.forbes.ru/biznes/497814-100-krupnejsih-kompanij-rossii-po-cistoj-pribyli-2023-rejting-forbes
