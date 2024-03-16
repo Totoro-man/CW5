@@ -10,5 +10,5 @@
 
 # БД типа PostgreSQL
 
-Список компаний взят со страниы
+Список компаний взят со страницы
 https://www.forbes.ru/biznes/497814-100-krupnejsih-kompanij-rossii-po-cistoj-pribyli-2023-rejting-forbes
