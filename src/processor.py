@@ -82,8 +82,15 @@ def db_insert_vacancies(config: dict, vacancies_list: list) -> (bool, str):
     return True, 'All OK'
 
 
-def db_make_request(params: list) -> (bool, list | str):
-    pass
+def make_cw5_requests(config: dict):
+    db = Db(config)
+    db.get_companies_and_vacancies_count()
+    db.get_all_vacancies()
+    db.get_avg_salary()
+    db.get_vacancies_with_higher_salary()
+    db.get_vacancies_with_keywords(['едущий', 'лавный'])
+    db.stop()
+    del db
 
 
 def error_handling(error: str):

@@ -44,11 +44,7 @@ def main():
     else:
         print('Данные о вакансиях успешно добавлены в БД')
 
-    # is_ok, result = db_fill_db(result)
-    # if not is_ok:
-    #     error_handling(result)
-    # else:
-    #     print('Данные о вакансиях успешно добавлены в БД')
+    make_cw5_requests(db_config)
 
 
 if __name__ == "__main__":

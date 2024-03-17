@@ -1,5 +1,4 @@
 import psycopg2
-from psycopg2 import sql
 
 
 class Db:
@@ -37,3 +36,44 @@ class Db:
     def send_request(self, query: str):
         with self.conn.cursor() as cur:
             cur.execute(query)
+
+    def get_companies_and_vacancies_count(self):
+        query = ('SELECT employers.name, COUNT(vacancies.*) '
+                 'FROM employers '
+                 'JOIN vacancies ON vacancies.employer_id = employers.id '
+                 'GROUP BY employers.name')
+        with self.conn.cursor() as cur:
+            cur.execute(query)
+            print(cur.fetchall())
+
+    def get_all_vacancies(self):
+        query = ('SELECT e.name, v.name, v.salary_from, v.url '
+                 'FROM employers AS e '
+                 'JOIN vacancies AS v ON v.employer_id = e.id')
+        with self.conn.cursor() as cur:
+            cur.execute(query)
+            print(cur.fetchall())
+
+    def get_avg_salary(self):
+        query = 'SELECT AVG(salary_from) FROM vacancies'
+        with self.conn.cursor() as cur:
+            cur.execute(query)
+            print(cur.fetchall())
+
+    def get_vacancies_with_higher_salary(self):
+        query = ('SELECT name, salary_from, url FROM vacancies '
+                 'WHERE salary_from > (SELECT AVG(salary_from) FROM vacancies) '
+                 'ORDER BY salary_from DESC')
+        with self.conn.cursor() as cur:
+            cur.execute(query)
+            print(cur.fetchall())
+
+    def get_vacancies_with_keywords(self, keywords: list):
+        query = (f"SELECT name, salary_from, url FROM vacancies "
+                 f"WHERE requirement LIKE '%{keywords[0]}%' "
+                 f"OR name LIKE '%{keywords[0]}%' "
+                 f"OR responsibility LIKE '%{keywords[0]}%' "
+                 f"ORDER BY salary_from DESC")
+        with self.conn.cursor() as cur:
+            cur.execute(query)
+            print(cur.fetchall())
