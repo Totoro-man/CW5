@@ -47,7 +47,14 @@ def get_vacancies(employers: list) -> (bool, list | str):
     return True, vacancies_list
 
 
-def db_init_db(config: dict, file_path: str) -> (bool, str):
+def db_init_db(config: dict, file_path: str):
+    """
+    Создаем БД
+    Создаем Таблицы
+    :param config:
+    :param file_path:
+    :return:
+    """
     config2 = config.copy()
     new_db_name = config2.pop('dbname')
     db = Db(config2, new_db_name)
@@ -56,10 +63,15 @@ def db_init_db(config: dict, file_path: str) -> (bool, str):
     db.execute_sql_from_file(file_path)
     db.stop()
     del db
-    return True, 'All OK'
 
 
-def db_insert_employers(config: dict, employers_list: list) -> (bool, str):
+def db_insert_employers(config: dict, employers_list: list):
+    """
+    Добавляем данные о работодателях в БД
+    :param config:
+    :param employers_list:
+    :return:
+    """
     db = Db(config)
     for i in employers_list:
         query = (f'INSERT INTO employers ({', '.join(list(i.keys()))}) '
@@ -67,10 +79,15 @@ def db_insert_employers(config: dict, employers_list: list) -> (bool, str):
         db.send_request(query)
     db.stop()
     del db
-    return True, 'All OK'
 
 
-def db_insert_vacancies(config: dict, vacancies_list: list) -> (bool, str):
+def db_insert_vacancies(config: dict, vacancies_list: list):
+    """
+    Добавляем данные о вакансиях в БД
+    :param config:
+    :param vacancies_list:
+    :return:
+    """
     db = Db(config)
     for i in vacancies_list:
         query = (f'INSERT INTO vacancies ({', '.join(list(i.keys()))}) '
@@ -79,10 +96,14 @@ def db_insert_vacancies(config: dict, vacancies_list: list) -> (bool, str):
         db.send_request(query)
     db.stop()
     del db
-    return True, 'All OK'
 
 
 def make_cw5_requests(config: dict):
+    """
+    Выполняем скрипты из задания
+    :param config:
+    :return:
+    """
     db = Db(config)
     db.get_companies_and_vacancies_count()
     db.get_all_vacancies()
@@ -94,5 +115,10 @@ def make_cw5_requests(config: dict):
 
 
 def error_handling(error: str):
+    """
+    Должна быть обработка ошибок (может позже)
+    :param error:
+    :return:
+    """
     print(error)
     sys.exit()
