@@ -1,40 +1,88 @@
 import sys
 
-from api_libs.api_hh import HhAPI
+from src.api_hh import HhAPI
+from src.db import Db
+from src.utils import *
 
 
-def get_vacancies_from_hh(employers: list) -> (bool, list | str):
+def get_employers_profiles(employers: list) -> (bool, list | str):
+    """
+    Получаем список профилей необходимых нам работодателей
+    :param employers: список работодателей
+    :return:
+        is_ok: bool - успешность
+        result: list | str - полученный список или описание ошибки
+    """
     hh_api = HhAPI()
-    source_vacancies_list = []
+    employers_profiles_list = []
     for i in employers:
-        is_ok, result = hh_api.get_employer_id(i)
+        is_ok, result = hh_api.get_employer_profile(i)
         if is_ok:
-            is_ok, result = hh_api.get_vacancies(result)
-            if is_ok:
-                source_vacancies_list.append(result)
-            else:
-                return False, result
+            employer_profile = utils_parse_employer(result)
+            employers_profiles_list.append(employer_profile)
         else:
             return False, result
-    return True, source_vacancies_list
+    del hh_api
+    return True, employers_profiles_list
 
 
-def parse_vacancies(source_vacancies_list: list) -> list[dict]:
+def get_vacancies(employers: list) -> (bool, list | str):
+    """
+    Получаем список вакансий необходимых нам работодателей
+    :param employers: список профилей работодателей
+    :return:
+        is_ok: bool - успешность,
+        result: list | str - полученный список или описание ошибки
+    """
+    hh_api = HhAPI()
     vacancies_list = []
-    for i in source_vacancies_list:
-        pass
-    return vacancies_list
+    for i in employers:
+        is_ok, result = hh_api.get_vacancies(i['id'])
+        if is_ok:
+            i_vacancies_list = utils_parse_vacancies(result, i['id'])
+            vacancies_list.extend(i_vacancies_list)
+        else:
+            return False, result
+    del hh_api
+    return True, vacancies_list
 
 
-def init_db(config: dict) -> (bool, str):
-    pass
+def db_init_db(config: dict, file_path: str) -> (bool, str):
+    config2 = config.copy()
+    new_db_name = config2.pop('dbname')
+    db = Db(config2, new_db_name)
+    db.init_database()
+    db = Db(config)
+    db.execute_sql_from_file(file_path)
+    db.stop()
+    del db
+    return True, 'All OK'
 
 
-def fill_db(vacancies_list: list) -> (bool, str):
-    pass
+def db_insert_employers(config: dict, employers_list: list) -> (bool, str):
+    db = Db(config)
+    for i in employers_list:
+        query = (f'INSERT INTO employers ({', '.join(list(i.keys()))}) '
+                 f'VALUES ({i['id']}, \'{i['name']}\', \'{i['description']}\')')
+        db.send_request(query)
+    db.stop()
+    del db
+    return True, 'All OK'
 
 
-def make_request(params: list) -> (bool, list | str):
+def db_insert_vacancies(config: dict, vacancies_list: list) -> (bool, str):
+    db = Db(config)
+    for i in vacancies_list:
+        query = (f'INSERT INTO vacancies ({', '.join(list(i.keys()))}) '
+                 f'VALUES ({i['id']}, {i['employer_id']}, \'{i['name']}\', \'{i['requirement']}\','
+                 f'\'{i['responsibility']}\', {i['salary_from']}, \'{i['url']}\')')
+        db.send_request(query)
+    db.stop()
+    del db
+    return True, 'All OK'
+
+
+def db_make_request(params: list) -> (bool, list | str):
     pass
 
 
